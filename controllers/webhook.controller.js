@@ -4,17 +4,24 @@ const { retryWebhook } = require('../utils/retryWebhook');
 const WebhookEvent = require('../models/webhookEvent.model');
 
 const subscribe = async (req, res) => {
-  const { sourceUrl, callbackUrl } = req.body;
-  const userId = req.user.id;
-
-  try {
-    const newWebhook = new Webhook({ userId, sourceUrl, callbackUrl });
-    await newWebhook.save();
-    res.status(200).json(newWebhook);
-  } catch (error) {
-    res.status(500).json({ message: 'Error subscribing to webhook' });
-  }
-};
+    const { sourceUrl, callbackUrl } = req.body;
+    const userId = req.user.id;
+  
+    try {
+      const existingWebhook = await Webhook.findOne({ sourceUrl, callbackUrl });
+  
+      if (existingWebhook) {
+        return res.status(400).json({ message: 'Webhook with the same sourceUrl and callbackUrl already exists' });
+      }
+  
+      const newWebhook = new Webhook({ userId, sourceUrl, callbackUrl });
+      await newWebhook.save();
+      res.status(200).json(newWebhook);
+    } catch (error) {
+      res.status(500).json({ message: 'Error subscribing to webhook' });
+    }
+  };
+  
 
 const listSubscriptions = async (req, res) => {
   const userId = req.user.id;

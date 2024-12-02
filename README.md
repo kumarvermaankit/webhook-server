@@ -1,4 +1,4 @@
 
 ### Key Sections:
 - **Installation**: npm install.
-- **Running the Application**: npm run start.
+- **Running the Application**: node app.js.
